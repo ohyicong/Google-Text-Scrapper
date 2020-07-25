@@ -12,7 +12,7 @@ import os
 webdriver_path = os.getcwd()+"\\webdriver\\chromedriver.exe"
 csv_path = os.getcwd()+"\\data.csv"
 search_keys= ["dog","cat"]
-headless = True
+headless = False
 web_scrapper = GoogleTextScraper(webdriver_path,csv_path,headless)
 #search key, description, addition info
 for search_key in search_keys:
