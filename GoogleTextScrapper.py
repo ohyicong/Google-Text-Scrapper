@@ -55,7 +55,6 @@ class GoogleTextScraper():
         try:
             df = pd.read_csv(self.csv_path)
             df=pd.concat([df,pd.DataFrame(result,columns=["search key","type","text"])])
-            print(df)
             df.to_csv(self.csv_path,index=False)
         except:
             df=pd.DataFrame(result,columns=["search key","type","text"])

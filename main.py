@@ -18,5 +18,4 @@ web_scrapper = GoogleTextScraper(webdriver_path,csv_path,headless)
 for search_key in search_keys:
     result = web_scrapper.get_info(search_key)
     web_scrapper.save_info(result)
-    print(result)
 
