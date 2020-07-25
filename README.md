@@ -1,5 +1,5 @@
-# Google Image Scraper
- A library to scrap google images
+# Google Text Scraper
+ A library to scrap google text results
  
  Pre-requisites:
  1. Pip install Selenium Library
@@ -9,17 +9,16 @@
  
 Usage:
 
+from GoogleTextScrapper import GoogleTextScraper
 import os
-
-from GoogleImageScrapper import GoogleImageScraper
 
 
 webdriver_path = os.getcwd()+"\\webdriver\\chromedriver.exe"
+csv_path = os.getcwd()+"\\data.csv"
+search_keys= ["apple","microsoft","netflix"]
+headless = False
+web_scrapper = GoogleTextScraper(webdriver_path,csv_path,headless)
+for search_key in search_keys:
+    result = web_scrapper.get_info(search_key)
+    web_scrapper.save_info(result)
 
-image_path = os.getcwd()+"\\photos"
-
-image_scrapper = GoogleImageScraper(webdriver_path,image_path,"cat",10)
-
-image_urls = image_scrapper.find_image_urls()
-
-image_scrapper.save_images(image_urls)
