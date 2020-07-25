@@ -36,6 +36,7 @@ class GoogleTextScraper():
         
         driver = webdriver.Chrome(self.webdriver_path, chrome_options=options)
         driver.get(self.url)
+        time.sleep(1)
         driver.find_element_by_xpath("/html/body/div/div[2]/form/div[2]/div[1]/div[1]/div/div[2]/input").send_keys(search_key)
         driver.find_element_by_xpath("/html/body/div/div[2]/form/div[2]/div[1]/div[1]/div/div[2]/input").send_keys(Keys.RETURN)
         try:
@@ -45,10 +46,14 @@ class GoogleTextScraper():
             for attribute in attributes:
                 info = attribute.text.split(":",1)
                 result.append([search_key, info[0].lower().replace("–","-"), info[1].lower().replace("–","-")])
+            time.sleep(1)
+            driver.close()
             return result
         except NoSuchElementException:
             print("GoogleTextScraper Notification: No description found for %s."%(search_key))
+            driver.close()
             return None
+        
     def save_info (self, result):
         print("GoogleTextScraper Notification: Saving...")
         
