@@ -6,9 +6,17 @@ Created on Sat Jul 18 13:01:02 2020
 """
 #import selenium drivers
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import NoSuchElementException 
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.support.ui import Select
+from selenium.common.exceptions import NoSuchElementException   
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import UnexpectedAlertPresentException
+from selenium.webdriver.chrome.options import Options
+
 #import helper libraries
 import time
 import urllib.request
@@ -27,7 +35,6 @@ class GoogleTextScraper():
 
     
     def get_info(self,search_key):
-        #save images into file directory
         result = []
         print("GoogleTextScraper Notification: Searching for %s."%(search_key))
         options = Options()
@@ -36,7 +43,8 @@ class GoogleTextScraper():
         
         driver = webdriver.Chrome(self.webdriver_path, chrome_options=options)
         driver.get(self.url)
-        time.sleep(1)
+        time.sleep(3)
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '/html/body/div/div[2]/form/div[2]/div[1]/div[1]/div/div[2]/input')))
         driver.find_element_by_xpath("/html/body/div/div[2]/form/div[2]/div[1]/div[1]/div/div[2]/input").send_keys(search_key)
         driver.find_element_by_xpath("/html/body/div/div[2]/form/div[2]/div[1]/div[1]/div/div[2]/input").send_keys(Keys.RETURN)
         try:
