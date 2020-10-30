@@ -40,10 +40,13 @@ class GoogleTextScraper():
         options = Options()
         if(self.headless):
             options.add_argument('--headless')
-        
-        driver = webdriver.Chrome(self.webdriver_path, chrome_options=options)
-        driver.get(self.url)
-        time.sleep(3)
+        try:
+            driver = webdriver.Chrome(self.webdriver_path, chrome_options=options)
+            driver.get(self.url)
+            time.sleep(3)
+        except:
+            print("[-] Please update the chromedriver.exe in the webdriver folder according to your chrome version:https://chromedriver.chromium.org/downloads")
+
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '/html/body/div/div[2]/form/div[2]/div[1]/div[1]/div/div[2]/input')))
         driver.find_element_by_xpath("/html/body/div/div[2]/form/div[2]/div[1]/div[1]/div/div[2]/input").send_keys(search_key)
         driver.find_element_by_xpath("/html/body/div/div[2]/form/div[2]/div[1]/div[1]/div/div[2]/input").send_keys(Keys.RETURN)
