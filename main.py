@@ -9,8 +9,8 @@ from GoogleTextScrapper import GoogleTextScraper
 import os
 
 
-webdriver_path = os.getcwd()+"\\webdriver\\chromedriver.exe"
-csv_path = os.getcwd()+"\\data.csv"
+webdriver_path = os.path.normpath(os.getcwd()+"\\webdriver\\chromedriver.exe")
+csv_path =  os.path.normpath(os.getcwd()+"\\data.csv")
 search_keys= ["apple","microsoft","netflix"]
 headless = False
 web_scrapper = GoogleTextScraper(webdriver_path,csv_path,headless)

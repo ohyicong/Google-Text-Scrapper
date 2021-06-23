@@ -25,8 +25,32 @@ import os
 import requests
 import pandas as pd
 
+#custom patch libraries
+import patch 
+
 class GoogleTextScraper():
     def __init__(self,webdriver_path,csv_path,headless=False):
+        #check if chromedriver is updated
+        while(True):
+            try:
+                #try going to www.google.com
+                options = Options()
+                options.add_argument('--headless')
+                driver = webdriver.Chrome(webdriver_path, chrome_options=options)
+                driver.get("https://www.google.com")
+                driver.close()
+                break
+            except:
+                #patch chromedriver if not available or outdated
+                try:
+                    driver
+                except NameError:
+                    is_patched = patch.download_lastest_chromedriver()
+                else:
+                    is_patched = patch.download_lastest_chromedriver(driver.capabilities['version'])
+                if (not is_patched): 
+                    print("[ERR] Please update the chromedriver.exe in the webdriver folder according to your chrome version:https://chromedriver.chromium.org/downloads")
+                    break
         #check parameter types
         self.webdriver_path = webdriver_path
         self.csv_path = csv_path
@@ -36,45 +60,42 @@ class GoogleTextScraper():
     
     def get_info(self,search_key):
         result = []
-        print("GoogleTextScraper Notification: Searching for %s."%(search_key))
+        print("[INFO] Searching for %s."%(search_key))
         options = Options()
         if(self.headless):
             options.add_argument('--headless')
         try:
             driver = webdriver.Chrome(self.webdriver_path, chrome_options=options)
             driver.get(self.url)
-            time.sleep(3)
+            time.sleep(1)
         except:
-            print("[-] Please update the chromedriver.exe in the webdriver folder according to your chrome version:https://chromedriver.chromium.org/downloads")
+            print("[ERR] Please update the chromedriver.exe in the webdriver folder according to your chrome version:https://chromedriver.chromium.org/downloads")
 
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '/html/body/div/div[2]/form/div[2]/div[1]/div[1]/div/div[2]/input')))
-        driver.find_element_by_xpath("/html/body/div/div[2]/form/div[2]/div[1]/div[1]/div/div[2]/input").send_keys(search_key)
-        driver.find_element_by_xpath("/html/body/div/div[2]/form/div[2]/div[1]/div[1]/div/div[2]/input").send_keys(Keys.RETURN)
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.NAME, "q")))
+        driver.find_element_by_name("q").send_keys(search_key)
+        driver.find_element_by_name("q").send_keys(Keys.RETURN)
         try:
-            description = driver.find_element_by_xpath("/html/body/div[5]/div[2]/div[9]/div[1]/div[3]/div[1]/div/div[1]/div[2]/div/div/div[1]/div/div/div/div[1]/div/div/div/div/span[1]").text
+            description = str(driver.find_element_by_class_name("kno-rdesc").text)[11:]
             attributes = driver.find_elements_by_class_name("Z1hOCe")
-            result.append([search_key, "description", description.lower()])
+            result.append([search_key, "description", description.lower().replace("\n","")])
             for attribute in attributes:
-                info = attribute.text.split(":",1)
-                result.append([search_key, info[0].lower().replace("–","-"), info[1].lower().replace("–","-")])
+                if(attribute.text):
+                    info = attribute.text.split(":",1)
+                    result.append([search_key, info[0].lower().replace("\n",""), info[1].lower().replace("\n","")])
             time.sleep(1)
             driver.close()
             return result
         except NoSuchElementException:
-            print("GoogleTextScraper Notification: No description found for %s."%(search_key))
+            print("[INFO] No description found for %s."%(search_key))
             driver.close()
             return None
         
     def save_info (self, result):
-        print("GoogleTextScraper Notification: Saving...")
-        
-        try:
-            df = pd.read_csv(self.csv_path)
-            df=pd.concat([df,pd.DataFrame(result,columns=["search key","type","text"])])
-            df.to_csv(self.csv_path,index=False)
-        except:
+        print("[INFO] Saving to %s."%self.csv_path)
+        with open(self.csv_path,"a") as f:
             df=pd.DataFrame(result,columns=["search key","type","text"])
-            df.to_csv(self.csv_path,index=False)
+            df.to_csv(self.csv_path,index=False,mode="a",header=f.tell()==0)
+
 
     
 
